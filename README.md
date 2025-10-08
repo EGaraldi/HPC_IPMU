@@ -1,13 +1,29 @@
 # High Performance Computing at Kavli IPMU
 
-Useful tips and tricks for high-performance computing on the IPMU cluster.
+This page contains a set of useful tips and tricks for high-performance computing on the IPMU cluster. 
+
+> [!TIP]
+> If you have comments or suggestions to improve this page, please send them to `egaraldi 'at' ipmu 'dot' jp` or - better - make a pull request directly to this repo.
+
+## Contents
+ - [access](#accessing-the-machines) 
+ - [check usage](#check-the-usage)
+ - [pyhton environment](#setting-up-a-python-environment)
+ - [running jobs](#running-jobs-on-the-cluster)
+ - [accessing nodes](#accessing-the-compute-nodes)
+ - [using jupyter](#using-jupyter-and-port-forwarding)
+ - [IDE](#connecting-your-ide)
+ - [storage on idark](#where-to-work-on-idark) 
 
 ## Accessing the machines
 
-There are two main machines at IPMU:
+There are 5 available machines at IPMU:
 
-- `idark` is the main computer cluster.
-- `gpgpu` is a box with 8 GPUs.
+- `idark`, the main computer cluster.
+- `gw`, the previous computing cluster.
+- `gfarm`, another older computing cluster
+- `gpgpu`, a box with 8 GPUs.
+- `gpu cluster`, a newer machine with 20 GPUs.
 
 These machines are managed by IPMU's IT team, who can be reached at  `it 'at' ipmu 'dot' jp`. See the [internal webpage](https://www.ipmu.jp/en/employees-internal/computing) (ask the IT team for access) for technical details and specifications.
 
@@ -17,21 +33,24 @@ You will need an account on the machines you wish to access. Follow the IT team'
 
 Once you're all set up you can connect to the servers with
 ```bash
-$ ssh [username]@idark.ipmu.jp # for idark
+$ ssh [username]@idark.ipmu.jp  # for idark
+$ ssh [username]@192.168.156.68 # for gw
+$ ssh [username]@gfarm.ipmu.jp  # for gfarm
 $ ssh [username]@192.168.156.71 # for gpgpu
+$ ssh [username]@192.168.156.50 # for gpu cluster
 ```
 
-## Seeing what's going on
+## Check the usage
 
 Once you ssh onto the cluster, you'll want to see what everyone else is doing.
 
-The job manager on idark is PBS. To see what jobs are running, run
+The job manager on some machine (including idark) is PBS. To see what jobs are running, run
 
 ```bash
 [username@idark ~]$ qstat
 ```
 
-On gpgpu, the job manager is slurm. The equivalent command is
+On other machines, the job manager is slurm. The equivalent command is
 
 ```bash
 [username@gpgpu ~]$ squeue
@@ -48,6 +67,11 @@ It's important to know that there is no central system to allocate the GPUs on g
 Before running your own jobs, you may wish to set up your Python environment. Python 3 is already installed on the cluster, and there are two main approaches to managing your python installation: `conda` and `pyenv`. Choose whichever you prefer.
 
 ### Conda
+
+> [!CAUTION]
+> Recently (approx. 2024) Anaconda changed their pricing policy and can/will now charge users of medium-size organization if they use the default channel. Please make sure to do one of the following:
+> - use [miniforge](https://github.com/conda-forge/miniforge)
+> - in conda, replace the `default` package channel with `conda-forge` by running: `conda config --prepend channels new_channel && conda config --remove channels default`
 
 Conda is a python package and environment manager. Suppose you start a new project and want to use all of the up-to-date versions of your favorite python modules -- but want to keep older versions available for compatibility with previous projects. This is the rationale of conda. With conda you can create a library of separate python environments that you can activate anywhere on the cluster -- from the login node or compute nodes, either in interactive mode or directly inside your job scripts. 
 
@@ -271,15 +295,21 @@ and you'll see a kernel with name project-venv next time you launch jupyter.
 
 Most IDEs you run on your local computer can be connected to the cluster to allow you to edit your files there seamlessly. For vscode, for example, follow the instructions [here](https://code.visualstudio.com/docs/remote/ssh).
 
-# Where to work on idark
+> [!NOTE]
+> New versions (>1.98) of vscode will refuse connection because the system libraries on idark are too old. To fix this (thanks, Yasuda-san!) add the following to your `.bashrc`:
+> 
+> ```bash
+> export VSCODE_SERVER_CUSTOM_GLIBC_LINKER=/lustre/work/yasuda/ct_ng/toolchain-dir/x86_64-linux-gnu/x86_64-linux-gnu/sysroot/lib/ld-2.28.so
+> export VSCODE_SERVER_CUSTOM_GLIBC_PATH=/lustre/work/yasuda/ct_ng/toolchain-dir/x86_64-linux-gnu/x86_64-linux-gnu/sysroot/lib
+> export VSCODE_SERVER_PATCHELF_PATH=/lustre/work/yasuda/local/bin/patchelf
+> ```
+
+
+## Where to work on idark
 
 The `/home` file system has very limited space and may rapidly get congested if too many users are working and storing files there. As with previous clusters, iDark has a designated file system for work:
 
     /lustre/work/username
     
 The snag is that the output files from job scripts will not save to this file system -- could be quite inconvenient. This issue has been raised with IT, but for now you should create a directory in the `/home` file system (e.g. `/home/username/tmp/pbs/` where those files can be directed in the `#PBS -o` and `#PBS -e` lines of your job scripts.
-
-# Updates
-
-If you have any comments or suggestions for this goodie bag of tips and tricks, please send them to `connor.bottrell 'at' ipmu 'dot' jp` with a description or make a pull request directly to this repo.
 
