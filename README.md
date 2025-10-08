@@ -14,6 +14,7 @@ This page contains a set of useful tips and tricks for high-performance computin
  - [using jupyter](#using-jupyter-and-port-forwarding)
  - [IDE](#connecting-your-ide)
  - [storage on idark](#where-to-work-on-idark) 
+ - [globus endpoint](#globus-endpoint-on-idark) 
 
 ## Accessing the machines
 
@@ -313,3 +314,8 @@ The `/home` file system has very limited space and may rapidly get congested if 
     
 The snag is that the output files from job scripts will not save to this file system -- could be quite inconvenient. This issue has been raised with IT, but for now you should create a directory in the `/home` file system (e.g. `/home/username/tmp/pbs/` where those files can be directed in the `#PBS -o` and `#PBS -e` lines of your job scripts.
 
+## Globus endpoint on idark
+
+[Globus](https://app.globus.org/) is a powerful tool to transfer large amounts of data in an automated, unsupervised, safe way. An exhaustive tutorial is available [on the lobus.org website](https://docs.globus.org/getting-started/users/). 
+
+On `idark`, we have a public Globus endpoint installed, named `KIPMU-Collection`.
