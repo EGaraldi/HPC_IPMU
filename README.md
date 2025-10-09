@@ -1,13 +1,26 @@
+> [!TIP]
+> If you have comments or suggestions to improve this page, please send them to `egaraldi_at_ipmu.jp` or - better - make a pull request directly to this repo
+
 # High Performance Computing at Kavli IPMU
 
 This page contains a set of useful tips and tricks for high-performance computing on the IPMU cluster. 
 
-> [!TIP]
-> If you have comments or suggestions to improve this page, please send them to `egaraldi 'at' ipmu 'dot' jp` or - better - make a pull request directly to this repo.
+There are 5 available machines at IPMU:
+
+- `idark`, the main computer cluster.
+- `gw`, the previous computing cluster.
+- `gfarm`, another older computing cluster
+- `gpgpu`, a box with 8 GPUs.
+- `gpu cluster`, a newer machine with 20 GPUs.
+
+These machines are managed by IPMU's IT team, who can be reached at  `it_at_ipmu.jp`. 
+
+Technical details and specifications can be found in the [internal webpage](https://www.ipmu.jp/en/employees-internal/computing) (ask IT if you don't have access yet).
+
 
 ## Contents
  - [access](#accessing-the-machines) 
- - [check usage](#check-the-usage)
+ - [check usage](#check-the-machine-usage)
  - [pyhton environment](#setting-up-a-python-environment)
  - [running jobs](#running-jobs-on-the-cluster)
  - [accessing nodes](#accessing-the-compute-nodes)
@@ -18,19 +31,9 @@ This page contains a set of useful tips and tricks for high-performance computin
 
 ## Accessing the machines
 
-There are 5 available machines at IPMU:
+The machines can only be accessed from within the campus intranet. To use them from home, you need to use [the IPMU VPN](https://www.ipmu.jp/en/employees-internal/computing#VPN).
 
-- `idark`, the main computer cluster.
-- `gw`, the previous computing cluster.
-- `gfarm`, another older computing cluster
-- `gpgpu`, a box with 8 GPUs.
-- `gpu cluster`, a newer machine with 20 GPUs.
-
-These machines are managed by IPMU's IT team, who can be reached at  `it 'at' ipmu 'dot' jp`. See the [internal webpage](https://www.ipmu.jp/en/employees-internal/computing) (ask the IT team for access) for technical details and specifications.
-
-The machines can only be accessed from within the campus intranet. To use them from home, ask the IT team for VPN connection information.
-
-You will need an account on the machines you wish to access. Follow the IT team's instructions, which will involve sending them your ssh public key.
+You will need an account on the machines you wish to access. To get it, follow the instructions [on this page (section 3)](https://www.ipmu.jp/en/employees-internal/computing/cluster).
 
 Once you're all set up you can connect to the servers with
 ```bash
@@ -41,17 +44,17 @@ $ ssh [username]@192.168.156.71 # for gpgpu
 $ ssh [username]@192.168.156.50 # for gpu cluster
 ```
 
-## Check the usage
+## Check the machine usage
 
 Once you ssh onto the cluster, you'll want to see what everyone else is doing.
 
-The job manager on some machine (including idark) is PBS. To see what jobs are running, run
+The job manager on some machine (including idark) is [PBS](https://albertsk.org/wp-content/uploads/2011/12/pbs.pdf). To see what jobs are running, run
 
 ```bash
 [username@idark ~]$ qstat
 ```
 
-On other machines, the job manager is slurm. The equivalent command is
+On other machines, the job manager is [slurm](https://slurm.schedmd.com/documentation.html). The equivalent command is
 
 ```bash
 [username@gpgpu ~]$ squeue
@@ -65,13 +68,16 @@ It's important to know that there is no central system to allocate the GPUs on g
 
 ## Setting up a Python environment
 
+> [!TIP]
+> The python version installed on the cluster is quite old by now. It is reccommended to install a more recent version using e.g. conda (see below).
+
 Before running your own jobs, you may wish to set up your Python environment. Python 3 is already installed on the cluster, and there are two main approaches to managing your python installation: `conda` and `pyenv`. Choose whichever you prefer.
 
 ### Conda
 
 > [!CAUTION]
 > Recently (approx. 2024) Anaconda changed their pricing policy and can/will now charge users of medium-size organization if they use the default channel. Please make sure to do one of the following:
-> - use [miniforge](https://github.com/conda-forge/miniforge)
+> - use [miniforge](https://github.com/conda-forge/miniforge), a community-maintained, truly free version of conda;
 > - in conda, replace the `default` package channel with `conda-forge` by running: `conda config --prepend channels new_channel && conda config --remove channels default`
 
 Conda is a python package and environment manager. Suppose you start a new project and want to use all of the up-to-date versions of your favorite python modules -- but want to keep older versions available for compatibility with previous projects. This is the rationale of conda. With conda you can create a library of separate python environments that you can activate anywhere on the cluster -- from the login node or compute nodes, either in interactive mode or directly inside your job scripts. 
