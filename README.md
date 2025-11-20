@@ -244,6 +244,34 @@ python my_program.py
 
 Please use only one GPU at a time, to prevent congestion.
 
+### Fine-grained controls
+
+#### MPI Tasks assignment
+
+There are multiple ways to assign MPI tasks to physical CPUs. Two common ways are contiguous and round-robin assignment, i.e.
+
+*round-robin assignment*
+|  node  |  MPI tasks | 
+---------|------------| 
+| 1      |  0, 3, 6, 9, ...|  
+| 2      |  1, 4, 7, 10, ...|  
+| 3      |  2, 5, 8, 11, ...|  
+
+
+*contiguous assignment*
+|  node  |  MPI tasks | 
+---------|------------| 
+| 1      |  0, 1, 2, 3, ...|  
+| 2      |  52, 53, 54, 55, ...| 
+| 3      |  104, 105, 106, 107, ...| 
+
+By default, PBS assigns MPI Tasks in a round-robin fashion. To force a contiguous assignment (as done by e.g. SLURM), use:
+
+``` bash
+#PBS -l select=3:ncpus=52:mem=4gb:mpiprocs=52
+```
+Notice the last part (`:mpiprocs=52`), which is redundant, but forces a contiguous assignment. 
+
 ## Accessing the compute nodes
 
 On idark, you can directly access the compute node that is running your job. First identify the node by running
