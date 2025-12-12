@@ -11,7 +11,7 @@ There are 5 available machines at IPMU:
 - `gw`, the previous computing cluster.
 - `gfarm`, another older computing cluster
 - `gpgpu`, a box with 8 GPUs.
-- `gpu cluster`, a newer machine with 20 GPUs.
+- `igpu`, a newer machine with 20 GPUs.
 
 These machines are managed by IPMU's IT team, who can be reached at  `it_at_ipmu.jp`. 
 
@@ -28,6 +28,7 @@ Technical details and specifications can be found in the [internal webpage](http
  - [IDE](#connecting-your-ide)
  - [storage on idark](#where-to-work-on-idark) 
  - [globus endpoint](#globus-endpoint-on-idark) 
+ - [igpu server](#igpu-server)
 
 ## Accessing the machines
 
@@ -41,7 +42,7 @@ $ ssh [username]@idark.ipmu.jp  # for idark
 $ ssh [username]@192.168.156.68 # for gw
 $ ssh [username]@gfarm.ipmu.jp  # for gfarm
 $ ssh [username]@192.168.156.71 # for gpgpu
-$ ssh [username]@192.168.156.50 # for gpu cluster
+$ ssh [username]@192.168.156.50 # for igpu
 ```
 
 ## Check the machine usage
@@ -353,3 +354,46 @@ The snag is that the output files from job scripts will not save to this file sy
 [Globus](https://app.globus.org/) is a powerful tool to transfer large amounts of data in an automated, unsupervised, safe way. An exhaustive tutorial is available [on the lobus.org website](https://docs.globus.org/getting-started/users/). 
 
 On `idark`, we have a public Globus endpoint installed, named `KIPMU-Collection`.
+
+## IGPU server
+
+The IGPU cluster is for GPU-focused work loads. It has 8+1 nodes with 4 V100 GPUs each. Contact `leander[dot]thiele[at]ipmu[dot]jp`.
+
+In contrast to IDark, IGPU uses the Slurm scheduling system. 
+
+Some tips:
+- Use `ssh igpuNN` to login to the compute nodes. There you can use `nvidia-smi` or `gpustat` (recommended) to monitor GPU utilization.
+- In machine learning applications, it is sometimes nontrivial to use the GPUs efficiently. Consider using multiprocessing on CPUs to improve GPU utilization.
+- It has been observed that a bug in Slurm puts jobs on the head node. Use `#SBATCH --nodelist=igpuNN` or similar to prevent such behavior.
+- I recommend the `micromamba` environment manager (faster and free compared to `conda`).
+
+The following is a minimal job submission script illustrating the main things.
+It contains some peculiarities for making PyTorch distributed training work across multiple nodes.
+```bash
+#!/usr/bin/env bash
+
+#SBATCH --job-name=fnldmA
+#SBATCH -N 4
+#SBATCH --ntasks=16
+#SBATCH --gpus-per-task=1
+#SBATCH --gpu-bind=none
+#SBATCH -t 96:00:00
+#SBATCH --output=logs/%x_%j.out
+#SBATCH --error=logs/%x_%j.err
+
+# from tutorial at https://pytorch-geometric.readthedocs.io/en/latest/tutorial/multi_node_multi_gpu_vanilla.html
+export MASTER_PORT=$(expr 10000 + $(echo -n $SLURM_JOBID | tail -c 4))
+export MASTER_ADDR=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
+echo "MASTER_ADDR:MASTER_PORT="${MASTER_ADDR}:${MASTER_PORT}
+
+# neccessary for the GLOO cpu-to-cpu communication protocol to work
+export GLOO_SOCKET_IFNAME=eno3
+
+# this is specific to the micromamba manager
+source ~/.bashrc
+eval "$(micromamba shell hook --shell bash)"
+micromamba activate void_finding
+
+# use srun to launch ntasks jobs
+srun python train.py --config=./configs/fnldmA.yaml
+```
