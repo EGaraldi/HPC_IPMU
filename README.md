@@ -367,6 +367,10 @@ Some tips:
 - It has been observed that a bug in Slurm puts jobs on the head node. Use `#SBATCH --nodelist=igpuNN` or similar to prevent such behavior.
 - I recommend the `micromamba` environment manager (faster and free compared to `conda`).
 
+Using the Slurm system:
+- `sinfo` to get an overview of node status
+- `squeue` to see queued and running jobs
+
 The following is a minimal job submission script illustrating the main things.
 It contains some peculiarities for making PyTorch distributed training work across multiple nodes.
 ```bash
