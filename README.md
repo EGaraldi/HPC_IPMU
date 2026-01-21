@@ -192,9 +192,11 @@ At which point you will see (project-venv) in the command prompt. If you now ins
 
 ## Running jobs on the cluster
 
-Anytime you want to run code on the cluster, you should do so in a job. There are a lot of different types of jobs.
+Anytime you want to run code on the cluster, you should do so by writing a job script, which is a self-contained full description of the resources requested and commands to be run. The exact format depends on the job scheduler software.
 
-The basic pattern for a PBS job on idark is
+### idark
+
+`idark` uses the  PBS job scheduler. A typical job script looks like this
 
 ```bash
 #!/bin/bash
@@ -227,7 +229,9 @@ qstat -u <your username>
 ```
 (more details on `qstat` can be found [here](https://www.jlab.org/hpc/PBS/qstat.html))
 
-For a  job on gpgpu, make sure to first run `nvidia-smi` and identify GPUs which are not being used. Then a typical slurm file looks like
+### gpgpu
+
+`gpgpu` uses the SLURM job scheduler. First of all, make sure to first run `nvidia-smi` and identify GPUs which are not being used. Then, a typical slurm file looks like
 
 ```
 #!/bin/bash
