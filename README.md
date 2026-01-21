@@ -201,7 +201,7 @@ The basic pattern for a PBS job on idark is
 #PBS -N demo
 #PBS -o /home/username/PBS/
 #PBS -e /home/username/PBS/
-#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l select=1:ncpus=2:mem=4gb
 #PBS -l walltime=0:0:30
 #PBS -u username
 #PBS -M username@ipmu.jp
@@ -209,13 +209,23 @@ The basic pattern for a PBS job on idark is
 #PBS -q tiny
 
 # activate python environment
-source ~/.bashrc 
-conda activate project-env
-# for pyenv/virtualenv instead use
-# source /home/username/project/project-venv/bin/activate
+source ~/.bashrc
 
-python my_program.py
+#your commands here, e.g.
+mpirun -np 2 my_parallel_code
 ```
+
+You can then submit the job script with
+
+```bash
+qsub job.sh
+```
+and check its status with 
+
+```bash
+qstat -u <your username>
+```
+(more details on `qstat` can be found [here](https://www.jlab.org/hpc/PBS/qstat.html))
 
 For a  job on gpgpu, make sure to first run `nvidia-smi` and identify GPUs which are not being used. Then a typical slurm file looks like
 
@@ -242,8 +252,20 @@ conda activate project-env
 
 python my_program.py
 ```
+> [!NOTE]
+> Please use only one GPU at a time, to prevent congestion!
 
-Please use only one GPU at a time, to prevent congestion.
+You can then submit the job script with
+
+```bash
+sbatch job.sh
+```
+and check its status with 
+
+```bash
+squeue -u <your username>
+```
+(more details on `squeue` can be found [here](https://slurm.schedmd.com/squeue.html))
 
 ### Fine-grained controls
 
