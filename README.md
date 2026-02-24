@@ -55,6 +55,8 @@ The job manager on some machine (including idark) is [PBS](https://albertsk.org/
 [username@idark ~]$ qstat
 ```
 
+Other PBS command can be found e.g. [here](https://datascience.101workbook.org/06-hpc/05-job-queue/02-pbs/02-pbs-cheatsheet/#gsc.tab=0). 
+
 On other machines, the job manager is [slurm](https://slurm.schedmd.com/documentation.html). The equivalent command is
 
 ```bash
