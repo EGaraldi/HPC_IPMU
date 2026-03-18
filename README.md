@@ -17,6 +17,7 @@ These machines are managed by IPMU's IT team, who can be reached at  `it_at_ipmu
 
 Technical details and specifications can be found in the [internal webpage](https://www.ipmu.jp/en/employees-internal/computing) (ask IT if you don't have access yet).
 
+If you need help, please use the `#cluster_computing` channel in the IPMU Astro slack. 
 
 ## Contents
  - [access](#accessing-the-machines) 
@@ -376,6 +377,17 @@ The `/home` file system has very limited space and may rapidly get congested if 
     /lustre/work/username
     
 The snag is that the output files from job scripts will not save to this file system -- could be quite inconvenient. This issue has been raised with IT, but for now you should create a directory in the `/home` file system (e.g. `/home/username/tmp/pbs/` where those files can be directed in the `#PBS -o` and `#PBS -e` lines of your job scripts.
+
+### Shared datasets
+To limit sotrage space, everyone is invited to share with all users the (large) datasets they download (e.g. numerical simulations, JWST program data, ...). 
+
+To do so, please:
+* fill in with the datasets you want to share the master document linked on the `#cluster_computing` channel of the IPMU Astro Slack. 
+* make sure users have read access to the data (to do so, run: chmod go+rX /path/to/data/folder , note the uppercase X)
+* make sure your scripts do not modify the data shared with other people
+* check the list before downloading new (large) datasets and use shared data if available.
+
+This little overhead will help us avoid setting hard user quotas on the storage. 
 
 ## Globus endpoint on idark
 
