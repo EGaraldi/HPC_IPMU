@@ -242,7 +242,7 @@ qstat -u <your username>
 #SBATCH --account=username
 #SBATCH --output=/home/username/log/%j.out  
 #SBATCH --error=/home/username/log/%j.err  
-#SBATCH --time==0+00:01:00
+#SBATCH --time=00:01:00
 #SBATCH --gres=gpu:1
 #SBATCH --mem=32G
 #SBATCH --cpus-per-gpu=6
