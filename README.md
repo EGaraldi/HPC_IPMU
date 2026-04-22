@@ -402,7 +402,13 @@ The IGPU cluster is for GPU-focused work loads. It has 8+1 nodes with 4 V100 GPU
 In contrast to IDark, IGPU uses the Slurm scheduling system. 
 
 Some tips:
-- Use `ssh igpuNN` to login to the compute nodes. There you can use `nvidia-smi` or `gpustat` (recommended) to monitor GPU utilization.
+- Use `ssh igpuNN` to login to the compute nodes. There you can use `nvidia-smi` or `gpustat` (recommended) to monitor GPU utilization. You will need to run the following commands in order to enable such `ssh` access:
+```
+$ ssh-keygen -t ed25519
+$ cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys
+$ chmod 600 ~/.ssh/authorized_keys
+$ chmod 700 ~/.ssh
+```
 - In machine learning applications, it is sometimes nontrivial to use the GPUs efficiently. Consider using multiprocessing on CPUs to improve GPU utilization.
 - It has been observed that a bug in Slurm puts jobs on the head node. Use `#SBATCH --nodelist=igpuNN` or similar to prevent such behavior.
 - I recommend the `micromamba` environment manager (faster and free compared to `conda`).
